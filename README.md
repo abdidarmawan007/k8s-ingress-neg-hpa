@@ -13,6 +13,5 @@ note :
 command for create Global IP Public and GCP SSL for Ingress
 
 gcloud beta compute --project={your-gcp-project} addresses create {name-ip} --global --network-tier=PREMIUM
-
 gcloud beta compute ssl-certificates create {name-ssl} --domains {your-domain}
 
