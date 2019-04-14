@@ -5,6 +5,7 @@ metadata:
   name: node-web
   annotations:
     cloud.google.com/neg: '{"ingress": true}' # Creates an NEG native LB Container after an Ingress is created
+    beta.cloud.google.com/backend-config: '{"ports": {"80":"backendconfig"}}' # Config timeout ingress
   labels:
     app: node-web
 spec:

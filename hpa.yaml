@@ -1,7 +1,6 @@
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  annotations:
   name: node-web
   namespace: default
 spec:
