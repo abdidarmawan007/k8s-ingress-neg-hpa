@@ -4,6 +4,8 @@
 
 ##### HPA (Horizontal Pod Autoscaler) = Trigger by CPU pods ######
 
+##### BackendConfig = Config timeout for ingress #####
+
 ##### Service = with config annotations NEG (container-native load balancing) cloud.google.com/neg: '{"ingress": true}' #####
  
 ##### Ingress = Use Global Loadbalancer GCP with config annotations Global IP Public,GCP SSL #####
