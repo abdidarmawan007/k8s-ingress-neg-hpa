@@ -5,7 +5,7 @@
 ##### HPA (Horizontal Pod Autoscaler) = Trigger by CPU pods ######
 
 ##### Service = with config annotations NEG (container-native load balancing) cloud.google.com/neg: '{"ingress": true}' #####
-
+ 
 ##### Ingress = Use Global Loadbalancer GCP with config annotations Global IP Public,GCP SSL #####
 
 
@@ -15,3 +15,6 @@ command for create Global IP Public and GCP SSL for Ingress
 gcloud beta compute --project={your-gcp-project} addresses create {name-ip} --global --network-tier=PREMIUM
 gcloud beta compute ssl-certificates create {name-ssl} --domains {your-domain}
 
+
+ingress with NEG (container-native load balancing) vs standard ingress
+![alt text](https://cloud.google.com/kubernetes-engine/images/neg.svg)
