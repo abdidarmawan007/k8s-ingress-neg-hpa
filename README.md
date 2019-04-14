@@ -19,7 +19,7 @@ gcloud beta compute --project={your-gcp-project} addresses create {name-ip} --gl
 gcloud beta compute ssl-certificates create {name-ssl} --domains {your-domain}
 
 
-ingress with NEG (container-native load balancing) vs standard ingress
+standard ingress vs ingress with NEG (container-native load balancing)
 ![alt text](https://cloud.google.com/kubernetes-engine/images/neg.svg)
 Benefits:
 - container-native load balancer talks directly with the Pods, and connections have fewer network hops, both latency and throughput are improved.
