@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: node-web
+spec:
+  replicas: 4
+  revisionHistoryLimit: 5
+  minReadySeconds: 20
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: node-web
+        env: staging
+    spec:
+      containers:
+      - name: node-web
+        image: richarvey/nginx-php-fpm
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+            requests:
+               cpu: "200m"
+               memory: "300Mi"
+            limits:
+               cpu: "500m"
+               memory: "600Mi"
+        # health checks self healing check port 80 response 200,
+        # if containers error (400-500) kubernetes restart the pod
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 25
+          timeoutSeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+           httpGet:
+             path: /
+             port: 80
+           initialDelaySeconds: 25
+           periodSeconds: 5
