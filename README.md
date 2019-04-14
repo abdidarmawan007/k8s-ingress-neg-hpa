@@ -4,5 +4,5 @@
 
 ##### HPA (Horizontal Pod Autoscaler) = Trigger by CPU pods ######
 
-##### Service = with annatation  NEG (container-native load balancing) cloud.google.com/neg: '{"ingress": true}' #####
+##### Service = with annotations NEG (container-native load balancing) cloud.google.com/neg: '{"ingress": true}' #####
 
