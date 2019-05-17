@@ -12,7 +12,7 @@
 
 
 note :
-GKE must be run in VPC-native 
+GKE must be run in VPC-native for support NEG 
 command for create Global IP Public and GCP SSL for Ingress
 
 gcloud beta compute --project={your-gcp-project} addresses create {name-ip} --global --network-tier=PREMIUM
