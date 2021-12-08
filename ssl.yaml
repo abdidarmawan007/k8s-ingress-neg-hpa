@@ -7,4 +7,5 @@ spec:
   domains:
     - abdi-test.lemonilo.com
     #- abdi-test-2.lemonilo.com
+    #- abdi-cool.lemonilo.com
 
