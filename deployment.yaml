@@ -1,47 +1,125 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: node-web
+  name: production-frontend
+  namespace: zeus
 spec:
-  replicas: 4
+  replicas: 1
   revisionHistoryLimit: 5
-  minReadySeconds: 20
+  minReadySeconds: 10
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 1
       maxSurge: 1
+  selector:
+    matchLabels:
+      app: production-frontend 
   template:
     metadata:
       labels:
-        app: node-web
-        env: staging
+        app: production-frontend
+        env: production
     spec:
       containers:
-      - name: node-web
-        image: richarvey/nginx-php-fpm
-        imagePullPolicy: Always
+      - name: production-frontend
+        image: nginxdemos/nginx-hello:latest
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         resources:
             requests:
-               cpu: "200m"
-               memory: "300Mi"
+               cpu: "100m"
+               memory: "200Mi"
             limits:
                cpu: "500m"
                memory: "600Mi"
-        # health checks self healing check port 80 response 200,
-        # if containers error (400-500) kubernetes restart the pod
         readinessProbe:
           httpGet:
             path: /
-            port: 80
-          initialDelaySeconds: 25
-          timeoutSeconds: 10
-          periodSeconds: 5
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 8
         livenessProbe:
            httpGet:
              path: /
-             port: 80
-           initialDelaySeconds: 25
-           periodSeconds: 5
+             port: 8080
+           initialDelaySeconds: 15
+           periodSeconds: 8
+        lifecycle: # zero-downtime for rolling deployment
+          preStop:
+            exec:
+              command: ["sh", "-c", "sleep 8"]      
+---
+# service
+apiVersion: v1
+kind: Service
+metadata:
+  name: production-frontend
+  namespace: zeus
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}' # Creates an NEG native LB Container after an Ingress is created
+    cloud.google.com/backend-config: '{"ports": {"80":"production-frontend"}}'
+  labels:
+    app: production-frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: production-frontend
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+---
+# hpa
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: production-frontend
+  namespace: zeus
+spec:
+  maxReplicas: 25
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: production-frontend
+  targetCPUUtilizationPercentage: 70
+---
+# backendconfig
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: production-frontend
+  namespace: zeus
+spec:
+  timeoutSec: 40
+  connectionDraining:
+    drainingTimeoutSec: 60
+  logging:
+    enable: false # enable = true
+    #sampleRate: 0.5
+  
+---
+## ingress gce
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: production-frontend
+  namespace: zeus
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "production-zeus"  # config for global static IP public
+    networking.gke.io/managed-certificates: "production-managed-cert"
+spec:
+  rules:
+    - host: abdi-test.lemonilo.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix # (Exact,Prefix or ImplementationSpecific)
+          backend:
+            service:
+              name: production-frontend
+              port:
+                number: 8080
