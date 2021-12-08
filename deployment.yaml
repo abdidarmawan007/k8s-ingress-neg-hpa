@@ -55,7 +55,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: zeus
+  namespace: production
   name: production-frontend
   annotations:
     cloud.google.com/neg: '{"ingress": true}' # Creates an NEG native LB Container after an Ingress is created
@@ -75,7 +75,7 @@ spec:
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  namespace: zeus
+  namespace: production
   name: production-frontend
 spec:
   maxReplicas: 25
@@ -90,7 +90,7 @@ spec:
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
-  namespace: zeus
+  namespace: production
   name: production-frontend
 spec:
   timeoutSec: 40
@@ -104,7 +104,7 @@ spec:
 apiVersion: networking.gke.io/v1beta1
 kind: FrontendConfig
 metadata:
- namespace: zeus
+ namespace: production
  name: production-frontend
 spec:
  sslPolicy: gke-ingress-ssl-policy #SSL policies
@@ -116,11 +116,11 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  namespace: zeus
+  namespace: production
   name: production-frontend
   annotations:
     kubernetes.io/ingress.class: "gce"
-    kubernetes.io/ingress.global-static-ip-name: "production-zeus"  # config for global static IP public
+    kubernetes.io/ingress.global-static-ip-name: "production-frontend"  # config for global static IP public
     networking.gke.io/managed-certificates: "production-managed-cert-1"
     networking.gke.io/v1beta1.FrontendConfig: "production-frontend"
 spec:
