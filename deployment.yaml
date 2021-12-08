@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: production-frontend
   namespace: zeus
+  name: production-frontend
 spec:
   replicas: 1
   revisionHistoryLimit: 5
@@ -55,8 +55,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: production-frontend
   namespace: zeus
+  name: production-frontend
   annotations:
     cloud.google.com/neg: '{"ingress": true}' # Creates an NEG native LB Container after an Ingress is created
     cloud.google.com/backend-config: '{"ports": {"80":"production-frontend"}}'
@@ -75,8 +75,8 @@ spec:
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: production-frontend
   namespace: zeus
+  name: production-frontend
 spec:
   maxReplicas: 25
   minReplicas: 1
@@ -90,8 +90,8 @@ spec:
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
-  name: production-frontend
   namespace: zeus
+  name: production-frontend
 spec:
   timeoutSec: 40
   connectionDraining:
@@ -99,25 +99,37 @@ spec:
   logging:
     enable: false # enable = true
     #sampleRate: 0.5
-  
 ---
-## ingress gce
+# frontendconfig 
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+ namespace: zeus
+ name: production-frontend
+spec:
+ sslPolicy: gke-ingress-ssl-policy #SSL policies
+ redirectToHttps:
+   enabled: true
+   responseCodeName: MOVED_PERMANENTLY_DEFAULT
+---
+# ingress gce
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: production-frontend
   namespace: zeus
+  name: production-frontend
   annotations:
     kubernetes.io/ingress.class: "gce"
     kubernetes.io/ingress.global-static-ip-name: "production-zeus"  # config for global static IP public
-    networking.gke.io/managed-certificates: "production-managed-cert"
+    networking.gke.io/managed-certificates: "production-managed-cert-1"
+    networking.gke.io/v1beta1.FrontendConfig: "production-frontend"
 spec:
   rules:
-    - host: abdi-test.lemonilo.com
+    - host: "abdi-test.lemonilo.com"
       http:
         paths:
-        - path: /
-          pathType: Prefix # (Exact,Prefix or ImplementationSpecific)
+        - path: "/*"
+          pathType: ImplementationSpecific # (Exact,Prefix or ImplementationSpecific)
           backend:
             service:
               name: production-frontend

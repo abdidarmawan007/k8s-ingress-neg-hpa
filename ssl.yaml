@@ -2,10 +2,7 @@ apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
   namespace: zeus
-  name: production-managed-cert
+  name: production-managed-cert-1
 spec:
   domains:
     - abdi-test.lemonilo.com
-    #- abdi-test-2.lemonilo.com
-    #- abdi-cool.lemonilo.com
-
