@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: zeus
+  namespace: production
   name: production-frontend
 spec:
   replicas: 1
